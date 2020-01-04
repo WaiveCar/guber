@@ -1,0 +1,3 @@
+#!/bin/sh
+set -x
+cp ../Ijiraq/Admin/dist/map.js .
