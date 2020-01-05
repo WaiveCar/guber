@@ -2,7 +2,7 @@
 session_start();
 // for a user, they're either
 //
-// find     -- finding available cars
+// available-- finding available cars
 // reserve  -- reserved a given car
 // waiting  -- waiting for a confirmed car
 // riding   -- inside a car
@@ -16,32 +16,34 @@ session_start();
 //
 // riding -> [ find ]
 //
-$_SESSION['car'] = 107;
+function getgoober($id) {
+  $list = json_decode(file_get_contents('http://waivescreen.com/api/screens?goober_id=' . $id), true);
+  if(count($list) > 0) {
+    return $list[0];
+  }
+}
 function getcar($id) {
-  $list = json_decode(file_get_contents('waivescreen.com/api/screens?id=' . $id), true);
+  $list = json_decode(file_get_contents('http://waivescreen.com/api/screens?id=' . $id), true);
   return $list[0];
 }
 
-if(!array_key_exists('state', $_SESSION)) {
-  $_SESSION['state'] = 'find';
-  // this means there's a car
-} else if($_SESSION['state'] != 'find') {
-  $car = $_SESSION['car'];
-  $obj = getcar($car);
-  // This is someone else's ride
-  if($obj['goober_state'] === 'available' || $obj['goober_state'] === 'unavailable') {
-    $_SESSION['state'] = 'find';
-    $car = false;
-    unset($_SESSION['car']);
+$state = 'available';
+if(array_key_exists('id', $_SESSION)) {
+  $id = $_SESSION['id'];
+  $car = getgoober($id);
+  if($car) {
+    $state = $car['goober_state'];
+  } else {
+    unset($_SESSION['id']);
   }
-}
-$state = $_SESSION['state'];
+} 
+
 
 $titleMap = [
-  'find' => 'Available Cars',
-  'reserve' => 'Waiting for Confirmation',
-  'waiting' => 'Driver is coming',
-  'riding' => 'Enjoy your trip'
+  'available' => 'Available Cars',
+  'reserved' => 'Waiting for Confirmation',
+  'confirmed' => 'Driver is coming',
+  'driving' => 'Enjoy your trip'
 ];
 ?>
 <!DOCTYPE html>
@@ -54,23 +56,26 @@ $titleMap = [
   <body>
     <h1><?= $titleMap[$state] ?></h1>
     <div id="map" class="map"></div>
-<? if ($state === 'find') { 
+<? if ($state === 'available') { 
     $filter = 'goober_state=available';
     echo '<button onclick=request()>Request Goober</button>';
-  } else if ($state == 'reserve') { 
+  } else if ($state == 'reserved') { 
     $filter = "car=$car";
     echo '<button onclick=cancel()>Cancel</button>';
-  } else if ($state == 'waiting') { 
+  } else if ($state == 'confirmed') { 
     $filter = "car=$car";
     echo '<button onclick=cancel()>Cancel</button>';
-  } else if ($state == 'riding') { 
+  } else if ($state == 'driving') { 
     $filter = "car=$car";
   } 
 ?>
   </body>
   <script src="map.js"></script>
+  <script src="socket.io.js"></script>
   <script>
-var filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
+var 
+  _socket = false,
+  filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
 //function toMap(what) {
 
 function getLocations() {
@@ -89,6 +94,7 @@ function api(what) {
 }
 
 function request() {
+  if(!car) { car = 107;} 
   return fetch('proxy.php?action=request&id=' + car)
     .then(response => response.json())
 }
@@ -100,6 +106,10 @@ function cancel() {
 }
 
 window.onload = function(){
+  _socket = io(':3000');
+  _socket.on('update', function(data) {
+    console.log(data);
+  });
   var sincity = [-115.1542192, 36.1316824];
   self._map = map({
     select: true,
@@ -122,3 +132,5 @@ window.onload = function(){
 }
   </script>
 </html>
+
+<? var_dump([$car, $state]);exit;?>
