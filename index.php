@@ -61,13 +61,17 @@ $titleMap = [
   <script>
 var filter = "<?= $filter ?>";
 function getLocations() {
-  fetch('/api/screens?' + filter);
+  fetch('http://waivescreen.com/api/screens?' + filter)
+    .then(response => response.json())
+    .then(all => {
+      console.log(all);
+    });
 }
 setInterval(function(){
 });
 
 function api(what) {
-  return fetch('/api/' + what + '?id=' + car)
+  return fetch('http://waivescreen.com/api/' + what + '?id=' + car)
     .then(response => response.json())
 }
 
