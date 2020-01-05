@@ -16,18 +16,20 @@ $state = $all['goober_state'];
   </head>
 <body class="<?=$state?>">
 Hi goober!
-<h1><?= $all['car'] ?> is currently <?= $all['goober_state'] ?></h1>
+<h1><?= $all['car'] ?> is <?= $all['goober_state'] ?></h1>
 
 <? if ($state === 'reserved') { ?>
   <button onclick=accept()>Accept</button>
   <button onclick=decline()>Decline</button>
 <? } else if ($state == 'confirmed') { ?>
-  <button onclick=unavailable()>Passenger's in</button>
+  <button onclick=driving()>Passenger's in</button>
   <button onclick=cancel()>Cancel</button>
 <? } else if ($state == 'unavailable') { ?>
   <button onclick=available()>Make Available</button>
 <? } else if ($state == 'available') { ?>
   <button onclick=unavailable()>Make Unavailable</button>
+<? } else if ($state == 'driving') { ?>
+  <button onclick=finish()>Passenger's dropped off</button>
 <? } ?>
 
 
@@ -39,7 +41,7 @@ function api(what) {
     .then(response => response.json())
 }
 
-['available','unavailable','accept'].forEach(row => {
+['available','finish','driving','unavailable','accept'].forEach(row => {
   self[row] = function() {
     api(row).then(function() {
       location.reload();
@@ -49,12 +51,12 @@ function api(what) {
 
 function decline() {
   if(confirm("Are you sure you want to decline?!")) {
-    api('decline');
+    api('decline').then(() => {location.reload()});
   }
 }
 function cancel() {
   if(confirm("Are you sure you want to cancel?!")) {
-    api('cancel');
+    api('cancel').then(() => {location.reload()});
   }
 }
 </script>

@@ -44,7 +44,7 @@ $titleMap = [
     <h1><?= $titleMap[$state] ?></h1>
     <div id="map" class="map"></div>
 <? if ($state === 'find') { 
-    $filter = 'state=available';
+    $filter = 'goober_state=available';
     echo '<button onclick=request()>Request Goober</button>';
   } else if ($state == 'reserve') { 
     $filter = "car=$car";
@@ -59,7 +59,9 @@ $titleMap = [
   </body>
   <script src="map.js"></script>
   <script>
-var filter = "<?= $filter ?>";
+var filter = "<?= $filter ?>", car=107;
+//function toMap(what) {
+
 function getLocations() {
   fetch('http://waivescreen.com/api/screens?' + filter)
     .then(response => response.json())
@@ -86,15 +88,19 @@ function cancel() {
 }
 
 window.onload = function(){
+  var sincity = [-115.1542192, 36.1316824];
   self._map = map({
     select: true,
-    center: [-118.35,34.034]
+    center: sincity,
+    zoom: 14
   });
 
+  /*
   self.mypoints = _map.load([
     ["Point", [-118.33,34.024]],
     ["Location", [-118.35,34.034]]
   ]);
+   */
 
   _map.on('select', function(a) { 
     console.log(a.target.getFeatures().item(0).getId());
