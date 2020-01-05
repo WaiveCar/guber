@@ -74,6 +74,7 @@ $titleMap = [
   <script src="socket.io.js"></script>
   <script>
 var 
+  _carMap = {},
   _socket = false,
   filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
 //function toMap(what) {
@@ -108,9 +109,21 @@ function cancel() {
 window.onload = function(){
   _socket = io(':3000');
   _socket.on('update', function(data) {
+    data = JSON.parse(data);
     console.log(data);
+    if(data.type == 'car') {
+      if(_carMap[data.car]) {
+        _map.move(_carMap[data.car].index, data.lat, data.lng);
+      } else {
+        _carMap[data.car] = {
+          index: _map.addOne(["Location", [data.lng, data.lat], data.car])
+        };
+      }
+    }
   });
+
   var sincity = [-115.1542192, 36.1316824];
+
   self._map = map({
     select: true,
     center: sincity,
