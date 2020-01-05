@@ -29,12 +29,15 @@ if(!array_key_exists('state', $_SESSION)) {
   $car = $_SESSION['car'];
   $obj = getcar($car);
   // This is someone else's ride
+  /*
   if($obj['goober_state'] === 'available' || $obj['goober_state'] === 'unavailable') {
     $_SESSION['state'] = 'find';
     $car = false;
     unset($_SESSION['car']);
   }
+   */
 }
+$car = 107;
 $state = $_SESSION['state'];
 
 $titleMap = [
