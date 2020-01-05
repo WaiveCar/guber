@@ -16,15 +16,26 @@ session_start();
 //
 // riding -> [ find ]
 //
+$_SESSION['car'] = 107;
+function getcar($id) {
+  $list = json_decode(file_get_contents('waivescreen.com/api/screens?id=' . $id), true);
+  return $list[0];
+}
+
 if(!array_key_exists('state', $_SESSION)) {
   $_SESSION['state'] = 'find';
   // this means there's a car
 } else if($_SESSION['state'] != 'find') {
   $car = $_SESSION['car'];
+  $obj = getcar($car);
+  // This is someone else's ride
+  if($obj['goober_state'] === 'available' || $obj['goober_state'] === 'unavailable') {
+    $_SESSION['state'] = 'find';
+    $car = false;
+    unset($_SESSION['car']);
+  }
 }
 $state = $_SESSION['state'];
-
-$screenList = file_get_contents('waivescreen.com/api/screens');
 
 $titleMap = [
   'find' => 'Available Cars',
@@ -59,7 +70,7 @@ $titleMap = [
   </body>
   <script src="map.js"></script>
   <script>
-var filter = "<?= $filter ?>", car=107;
+var filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
 //function toMap(what) {
 
 function getLocations() {
