@@ -1,16 +1,15 @@
 <?
+$id = $_GET['id'];
+$all = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
 ?>
 <div id='success'></div>
-<?= $car ?> is currently <?= $state ?>
+Hi goober!
+<h1><?= $all['car'] ?> is currently <?= $all['goober_state'] ?></h1>
 
 <? if ($state === 'reserved') { ?>
-  <p>The passenger is at <?= $location ?></p>
-  <p>They requested the pickup <?= $when ?></p>
   <button onclick=accept()>Accept</button>
   <button onclick=decline()>Decline</button>
 <? } else if ($state == 'confirmed') { ?>
-  <p>The passenger is at <?= $location ?></p>
-  <p>They requested the pickup <?= $when ?></p>
   <button onclick=unavailable()>Passenger's in</button>
   <button onclick=cancel()>Cancel</button>
 <? } else if ($state == 'unavailable') { ?>
@@ -21,7 +20,7 @@
 
 
 <script>
-var car = <?= $id ?>;
+var car = <?= $all['id'] ?>;
 function api(what) {
   return fetch('/api/' + what + '?id=' + car)
     .then(response => response.json())
