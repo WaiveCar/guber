@@ -8,9 +8,6 @@ app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
 
-client.on('message', function(channel, message) {
-  console.log("sub channel " + channel + ": " + message);
-});
 io.on('connection', function(socket){
   client.on('message', function(channel, message) {
     socket.emit('update', message);
