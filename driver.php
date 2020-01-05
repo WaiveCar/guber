@@ -2,6 +2,12 @@
 $id = $_GET['id'];
 $all = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
 ?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+<body>
 <div id='success'></div>
 Hi goober!
 <h1><?= $all['car'] ?> is currently <?= $all['goober_state'] ?></h1>

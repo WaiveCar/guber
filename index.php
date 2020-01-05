@@ -38,6 +38,7 @@ $titleMap = [
   <head>
     <title><?= $titleMap[$state] ?></title>
     <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <h1><?= $titleMap[$state] ?></h1>
