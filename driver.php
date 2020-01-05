@@ -1,14 +1,20 @@
 <?
 $id = $_GET['id'];
-$all = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
+$all_list = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
+$all = $all_list[0];
+$state = $all['goober_state'];
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+    .unavailable { color: red }
+    .available { color: green }
+    .waiting { opacity: 0.7; background: #aaa}
+    </style>
   </head>
-<body>
-<div id='success'></div>
+<body class="<?=$state?>">
 Hi goober!
 <h1><?= $all['car'] ?> is currently <?= $all['goober_state'] ?></h1>
 
@@ -28,14 +34,15 @@ Hi goober!
 <script>
 var car = <?= $all['id'] ?>;
 function api(what) {
-  return fetch('/api/' + what + '?id=' + car)
+  document.body.classList.add('waiting');
+  return fetch('http://waivescreen.com/api/' + what + '?id=' + car)
     .then(response => response.json())
 }
 
 ['available','unavailable','accept'].forEach(row => {
   self[row] = function() {
     api(row).then(function() {
-      window.reload();
+      location.reload();
     });
   }
 });
