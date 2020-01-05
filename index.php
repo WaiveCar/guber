@@ -78,7 +78,8 @@ function api(what) {
 }
 
 function request() {
-  api('request');
+  return fetch('proxy.php?action=request&id=' + car)
+    .then(response => response.json())
 }
 
 function cancel() {
