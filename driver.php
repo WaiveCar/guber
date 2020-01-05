@@ -33,6 +33,7 @@ Hi goober!
 <? } ?>
 
 
+<script src="socket.io.js"></script>
 <script>
 var car = <?= $all['id'] ?>;
 function api(what) {

@@ -71,8 +71,11 @@ $titleMap = [
 ?>
   </body>
   <script src="map.js"></script>
+  <script src="socket.io.js"></script>
   <script>
-var filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
+var 
+  _socket = false,
+  filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
 //function toMap(what) {
 
 function getLocations() {
@@ -103,6 +106,10 @@ function cancel() {
 }
 
 window.onload = function(){
+  _socket = io(':3000');
+  _socket.on('update', function(data) {
+    console.log(data);
+  });
   var sincity = [-115.1542192, 36.1316824];
   self._map = map({
     select: true,
