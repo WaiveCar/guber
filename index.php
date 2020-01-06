@@ -52,6 +52,11 @@ $titleMap = [
     <title><?= $titleMap[$state] ?></title>
     <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+#map {
+  height: 70vw
+}
+</style>
   </head>
   <body>
     <h1><?= $titleMap[$state] ?></h1>
@@ -113,11 +118,11 @@ window.onload = function(){
     console.log(data);
     if(data.type == 'car') {
       if(_carMap[data.car]) {
+        //console.log("move>>", _carMap[data.car].index);
         _map.move(_carMap[data.car].index, data.lat, data.lng);
       } else {
-        _carMap[data.car] = {
-          index: _map.addOne(["Location", [data.lng, data.lat], data.car])
-        };
+        _carMap[data.car] = _map.addOne(["Point", [data.lng, data.lat], data.car]);
+        _map.fit();
       }
     }
   });
