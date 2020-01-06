@@ -160,4 +160,6 @@ window.onload = function(){
   </script>
 </html>
 
-<!--<? var_dump([$car, $state]);exit;?>-->
+<!--<? 
+echo session_id();
+var_dump([$car, $state]);exit;?>-->
