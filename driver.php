@@ -1,8 +1,21 @@
 <?
-$id = $_GET['id'];
-$all_list = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
-$all = $all_list[0];
-$state = $all['goober_state'];
+$gooberable = [
+  107, // work49
+  41,
+  80
+];
+if(isset($_GET['id']))
+  $id = $_GET['id'];
+  $all_list = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);
+  $all = $all_list[0];
+  $state = $all['goober_state'];
+} else {
+  $all_list = json_decode(file_get_contents("http://waivescreen.com/api/screens"), true);
+  $mycars = array_filter($all_list, function($row) uses($gooberable) {
+    return in_array($row['id'], $gooberable);
+  });
+  var_dump($mycars);exit;
+}
 ?>
 <!DOCTYPE html>
 <html>
