@@ -69,7 +69,7 @@ $titleMap = [
  <div class="find">
 
 <? if ($state === 'available') { 
-    $filter = 'goober_state=available';
+$filter = 'goober_state=available';
     echo '<button class="full" onclick=request()>Request Goober</button>';
   } else if ($state == 'reserved') { 
     $filter = "car=$car";
@@ -89,19 +89,35 @@ $titleMap = [
   <script>
 var 
   _carMap = {},
+  _blueDot = false,
   _socket = false,
   filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
 //function toMap(what) {
 
 function getLocations() {
-  fetch('http://waivescreen.com/api/screens?' + filter)
+  fetch('api/screens?' + filter)
     .then(response => response.json())
     .then(all => {
-      console.log(all);
+      all.forEach(row => {
+        moveCar(row);
+      }); 
     });
 }
-setInterval(function(){
-});
+
+function updateLocation(pos) {
+  var crd = pos.coords;
+  if(!_blueDot) {
+    let loc = [crd.longitude, crd.latitude];
+    _blueDot = _map.addOne(['Location', loc]);
+    _map.center(loc);
+  } else {
+    _map.move(_blueDot.index, crd.latitude, crd.longitude);
+  }
+}
+
+function locationError(what) {
+  console.log(what);
+}
 
 function api(what) {
   return fetch('http://waivescreen.com/api/' + what + '?id=' + car)
@@ -120,19 +136,22 @@ function cancel() {
   }
 }
 
+function moveCar(data) {
+  if(_carMap[data.id]) {
+    //console.log("move>>", _carMap[data.car].index);
+    _map.move(_carMap[data.id].index, data.lat, data.lng);
+  } else {
+    _carMap[data.id] = _map.addOne(["Point", [data.lng, data.lat], data.id]);
+  }
+}
+
 window.onload = function(){
-  _socket = io('http://oliverces.com:3000');
+  _socket = io();
   _socket.on('update', function(data) {
     data = JSON.parse(data);
     console.log(data);
     if(data.type == 'car') {
-      if(_carMap[data.car]) {
-        //console.log("move>>", _carMap[data.car].index);
-        _map.move(_carMap[data.car].index, data.lat, data.lng);
-      } else {
-        _carMap[data.car] = _map.addOne(["Point", [data.lng, data.lat], data.car]);
-        _map.fit();
-      }
+      moveCar(data);
     }
   });
 
@@ -150,6 +169,15 @@ window.onload = function(){
     ["Location", [-118.35,34.034]]
   ]);
    */
+ 
+  getLocations();
+  navigator.geolocation.watchPosition(
+    updateLocation, locationError, 
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    });
 
   _map.on('select', function(a) { 
     console.log(a.target.getFeatures().item(0).getId());
