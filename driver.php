@@ -1,9 +1,6 @@
 <?
-$gooberable = [
-  107, // work49
-  41,
-  80
-];
+include('common.php');
+$gooberable = get_goob();
 if(isset($_GET['id'])) {
   $id = $_GET['id'];
   $mycarList = json_decode(file_get_contents("http://waivescreen.com/api/screens?id=" . $id), true);

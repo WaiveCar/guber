@@ -1,5 +1,7 @@
 <?
 session_start();
+include('common.php');
+$gooberable = get_goob();
 // for a user, they're either
 //
 // available-- finding available cars
@@ -99,7 +101,7 @@ function getLocations() {
     .then(response => response.json())
     .then(all => {
       all.forEach(row => {
-        moveCar(row);
+        addCar(row);
       }); 
     });
 }
@@ -136,22 +138,46 @@ function cancel() {
   }
 }
 
+function removeCar(data) {
+  console.log("removing car");
+  if(_carMap[data.id]) {
+    _map.remove(_carMap[data.id].index);
+    delete _carMap[data.id];
+  }
+}
+
+function addCar(data) {
+  if(!_carMap[data.id]) {
+    let m  = _map.addOne(["Point", [data.lng, data.lat], data.id]);
+    console.log(m);
+    _carMap[data.id] = m;
+  } else {
+    moveCar(data);
+  }
+}
 function moveCar(data) {
   if(_carMap[data.id]) {
     //console.log("move>>", _carMap[data.car].index);
     _map.move(_carMap[data.id].index, data.lat, data.lng);
-  } else {
-    _carMap[data.id] = _map.addOne(["Point", [data.lng, data.lat], data.id]);
-  }
+  } 
 }
 
 window.onload = function(){
   _socket = io();
   _socket.on('update', function(data) {
     data = JSON.parse(data);
-    console.log(data);
+      console.log(data);
     if(data.type == 'car') {
       moveCar(data);
+    }
+    if(data.type == 'update') {
+      if(data.state == 'available') {
+        addCar(data);
+      } else if(data.state == 'unavailable') {
+        removeCar(data);
+      }
+    } else {
+      console.log(data);
     }
   });
 
@@ -163,13 +189,6 @@ window.onload = function(){
     zoom: 14
   });
 
-  /*
-  self.mypoints = _map.load([
-    ["Point", [-118.33,34.024]],
-    ["Location", [-118.35,34.034]]
-  ]);
-   */
- 
   getLocations();
   navigator.geolocation.watchPosition(
     updateLocation, locationError, 
@@ -190,4 +209,4 @@ window.onload = function(){
 
 <!--<? 
 echo session_id();
-var_dump([$car, $state]);exit;?>-->
+exit;?>-->
