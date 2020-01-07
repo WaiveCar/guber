@@ -112,7 +112,7 @@ function cancel() {
 }
 
 window.onload = function(){
-  _socket = io(':3000');
+  _socket = io('http://oliverces.com:3000');
   _socket.on('update', function(data) {
     data = JSON.parse(data);
     console.log(data);
