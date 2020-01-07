@@ -69,7 +69,7 @@ $titleMap = [
  <div class="find">
 
 <? if ($state === 'available') { 
-$filter = '';//goober_state=available';
+$filter = 'goober_state=available';
     echo '<button class="full" onclick=request()>Request Goober</button>';
   } else if ($state == 'reserved') { 
     $filter = "car=$car";
@@ -107,7 +107,9 @@ function getLocations() {
 function updateLocation(pos) {
   var crd = pos.coords;
   if(!_blueDot) {
-    _blueDot = _map.addOne(['Location', [crd.longitude, crd.latitude]]);
+    let loc = [crd.longitude, crd.latitude];
+    _blueDot = _map.addOne(['Location', loc]);
+    _map.center(loc);
   } else {
     _map.move(_blueDot.index, crd.latitude, crd.longitude);
   }
@@ -167,7 +169,8 @@ window.onload = function(){
     ["Location", [-118.35,34.034]]
   ]);
    */
-
+ 
+  getLocations();
   navigator.geolocation.watchPosition(
     updateLocation, locationError, 
     {
