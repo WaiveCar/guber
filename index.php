@@ -1,5 +1,9 @@
 <?
 session_start();
+if(!isset($_SESSION['secret'])) {
+  header("Location: login.php");
+  exit;
+}
 include('common.php');
 $gooberable = get_goob();
 // for a user, they're either
@@ -58,7 +62,7 @@ $titleMap = [
   <head>
     <title><?= $titleMap[$state] ?></title>
     <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
-    <link rel="stylesheet" href="style.css" type="text/css">
+    <link rel="stylesheet" href="style.css?1" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
 #map {
@@ -85,7 +89,7 @@ $titleMap = [
    </div>
    <div id=confirmed>
     <h2>Confirmed! Your driver is coming. They'll call you when they're near</h2>
-    <input id=number type=text placeholder="Best number to reach you"><button onclick='savenumber()' class='small'>ok</button>
+    <input id=number type=text placeholder="Best number to reach you"><button onclick='savenumber(this)' class='small'>ok</button>
     <div style=text-align:center;margin-top:1rem>
     <button class=muted onclick=cancel()>Cancel ride</button>
     </div>
@@ -202,8 +206,10 @@ function moveCar(data) {
     _map.move(_carMap[data.id].index, data.lat, data.lng);
   } 
 }
-function savenumber() {
-  fetch('api/goobup?number=' + $("#number").val() + '&id=' + _goober_id);
+function savenumber(el) {
+  fetch('api/goobup?number=' + $("#number").val() + '&id=' + _goober_id).then(function() {
+    el.style.display = 'none';
+  });
 }
 
 function gen() {
@@ -234,6 +240,19 @@ window.onload = function(){
       if(data.state == 'reserved') {
         if(data.user_id == _me.id) {
           _state = 'reserved';
+          gen();
+        }
+      }
+      if(data.state == 'driving') {
+        if(data.user_id == _me.id) {
+          _state = 'driving';
+          gen();
+        }
+      }
+      if(data.state == 'finished') {
+        if(data.user_id == _me.id) {
+          _state = 'start';
+          _car = false;
           gen();
         }
       }

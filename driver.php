@@ -46,6 +46,11 @@ h1 { margin: 0.5rem}
     <button onclick=accept(<?= $car['id'] ?>)>Accept</button>
     <button onclick=decline(<?= $car['id'] ?>)>Decline</button>
   <? } else if ($state == 'confirmed') { ?>
+    <div id='map'></div>
+    <a id=map-link>Open in maps</a>
+    <script>
+    self.goob = <?= getGoober($car['goober_id']); ?>[0];
+    </script>
     <button onclick=driving(<?= $car['id'] ?>)>Passenger's in</button>
     <button onclick=cancel(<?= $car['id'] ?>)>Cancel</button>
   <? } else if ($state == 'unavailable') { ?>

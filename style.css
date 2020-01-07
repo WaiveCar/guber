@@ -40,7 +40,7 @@ button.primary {
   background: #514aff;
   font-size: 1.05rem;
 }
-input[type="text"],textarea {
+input[type="text"],input[type="password"],textarea {
   padding: .5rem;
   border-radius: 2.5vh;
   background: #edecff;
@@ -200,7 +200,7 @@ iframe {
 #bottom.start { height: 15vh}
 #bottom.reserved { height: 25vh}
 #bottom.available { height: 25vh}
-#bottom.confirmed { height: 40vh}
+#bottom.confirmed { height: 30vh}
 @media all and (orientation:landscape) {
   #header { 
     display: none 
