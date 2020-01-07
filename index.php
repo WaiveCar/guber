@@ -18,7 +18,7 @@ $gooberable = get_goob();
 //
 // riding -> [ find ]
 //
-function getgoober($id) {
+function getgooberCar($id) {
   $list = json_decode(file_get_contents('http://waivescreen.com/api/screens?goober_id=' . $id), true);
   if(count($list) > 0) {
     return $list[0];
@@ -28,12 +28,17 @@ function getcar($id) {
   $list = json_decode(file_get_contents('http://waivescreen.com/api/screens?id=' . $id), true);
   return $list[0];
 }
+function getgooberInfo($id) {
+  return file_get_contents("http://waivescreen.com/api/goober?id=" . $id);
+}
 
 $state = 'available';
+$goober = 0;
 if(array_key_exists('id', $_SESSION)) {
   $id = $_SESSION['id'];
-  $car = getgoober($id);
-  if($car) {
+  $goober = $id;
+  $car = getgooberCar($id);
+  if($car && !empty($car)) {
     $state = $car['goober_state'];
   } else {
     unset($_SESSION['id']);
@@ -57,35 +62,55 @@ $titleMap = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
 #map {
-  height: 70vw
+  height: 90vh
 }
+.find > div { display: none }
 </style>
   </head>
   <body class=mode-find>
-  <div id="header">
+  <div id="map" class="map"></div>
+  <div id="bottom">
+    <div class="find">
 
-    <h1><?= $titleMap[$state] ?></h1>
+   <div id=start>
+    <h2>To start, tap on the car that's closest to you</h2>
+   </div> 
+   <div id=available>
+    <h2>To request a ride, tap the button below</h2>
+    <button class="full" onclick=request()>Request</button>
+   </div>
+   <div id=reserved>
+    <h2>Your vehicle is reserved. Waiting on driver to confirm...</h2>
+    <button onclick=cancel()>Cancel</button>
+   </div>
+   <div id=confirmed>
+    <h2>Confirmed! Your driver is coming. They'll call you when they're near</h2>
+    <input id=number type=text placeholder="Best number to reach you"><button onclick='savenumber()' class='small'>ok</button>
+    <div style=text-align:center;margin-top:1rem>
+    <button class=muted onclick=cancel()>Cancel ride</button>
+    </div>
+   </div>
+   <div id=driving>
+    <h2>Have a pleasant trip!</h2>
+   </div>
+  </div>
 </div>
-    <div id="map" class="map"></div>
-<div id="bottom">
- <div class="find">
-
 <? if ($state === 'available') { 
 $filter = 'goober_state=available';
-    echo '<button class="full" onclick=request()>Request Goober</button>';
   } else if ($state == 'reserved') { 
     $filter = "car=$car";
-    echo '<button onclick=cancel()>Cancel</button>';
   } else if ($state == 'confirmed') { 
     $filter = "car=$car";
-    echo '<button onclick=cancel()>Cancel</button>';
   } else if ($state == 'driving') { 
     $filter = "car=$car";
   } 
 ?>
-</div>
-</div>
   </body>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+
   <script src="map.js"></script>
   <script src="socket.io.js"></script>
   <script>
@@ -93,9 +118,16 @@ var
   _carMap = {},
   _blueDot = false,
   _socket = false,
+  _state = "<?= $state ?>",
+  _goober_id = <?= $goober ?>,
+  _goober_info = false,
   _me = {id:"<?=session_id(); ?>"},
   filter = "<?= $filter ?>", 
-  _car = <? if($car) { echo $car; } else { echo 'false'; } ?>;
+  _car = <? if($car) { echo $car['id']; } else { echo 'false'; } ?>;
+
+<? if ($goober) { ?>
+_goober_info = <?= getgooberInfo($goober); ?>[0];
+<? } ?> 
 
 function getLocations() {
   fetch('api/screens?' + filter)
@@ -129,7 +161,7 @@ function mekv() {
 }
 
 function api(what) {
-  return fetch('http://waivescreen.com/api/' + what + '?id=' + _car + mekv())
+  return fetch('api/' + what + '?id=' + _car + mekv())
     .then(response => response.json())
 }
 
@@ -140,7 +172,11 @@ function request() {
 
 function cancel() {
   if(confirm("Are you sure you want to cancel?!")) {
-    api('cancel');
+    api('cancel').then(function() {
+      _state = 'available';
+      _car = false;
+      gen();
+    });
   }
 }
 
@@ -166,7 +202,26 @@ function moveCar(data) {
     _map.move(_carMap[data.id].index, data.lat, data.lng);
   } 
 }
+function savenumber() {
+  fetch('api/goobup?number=' + $("#number").val() + '&id=' + _goober_id);
+}
 
+function gen() {
+  let el = '';
+  if(_state === "available" && !_car) {
+    el = 'start';
+  } else {
+    el = _state;
+  }
+  $("#" + el).show().siblings().hide();
+  if(el == 'confirmed') {
+    if(_goober_info.phone) {
+      $("#number").val(_goober_info.phone);
+    }
+  }
+  document.getElementById('bottom').className = el;
+}
+    
 window.onload = function(){
   _socket = io();
   _socket.on('update', function(data) {
@@ -176,6 +231,17 @@ window.onload = function(){
       moveCar(data);
     }
     if(data.type == 'update') {
+      if(data.state == 'reserved') {
+        if(data.user_id == _me.id) {
+          _state = 'reserved';
+          gen();
+        }
+      }
+      if(data.state == 'confirmed') {
+        _state = 'confirmed';
+        gen();
+      }
+
       if(data.state == 'available') {
         addCar(data);
       } else if(data.state == 'unavailable') {
@@ -191,6 +257,7 @@ window.onload = function(){
     zoom: 14
   });
 
+  gen();
   getLocations();
 
   navigator.geolocation.watchPosition(
@@ -202,6 +269,7 @@ window.onload = function(){
 
   _map.on('select', function(a) { 
     _car = a.target.getFeatures().item(0).getId();
+    gen();
   })
 }
   </script>
