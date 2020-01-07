@@ -38,7 +38,7 @@ Hi goober!
     <h1><?= $car['car'] ?> is <?= $car['goober_state'] ?></h1>
 
   <? if ($state === 'reserved') { ?>
-    <button onclick=accept(<?= $car['id'] ?>)Accept</button>
+    <button onclick=accept(<?= $car['id'] ?>)>Accept</button>
     <button onclick=decline(<?= $car['id'] ?>)>Decline</button>
   <? } else if ($state == 'confirmed') { ?>
     <button onclick=driving(<?= $car['id'] ?>)>Passenger's in</button>
