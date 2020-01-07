@@ -51,6 +51,7 @@ $titleMap = [
   <head>
     <title><?= $titleMap[$state] ?></title>
     <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
 #map {
@@ -58,12 +59,18 @@ $titleMap = [
 }
 </style>
   </head>
-  <body>
+  <body class=mode-find>
+  <div id="header">
+
     <h1><?= $titleMap[$state] ?></h1>
+</div>
     <div id="map" class="map"></div>
+<div id="bottom">
+ <div class="find">
+
 <? if ($state === 'available') { 
     $filter = 'goober_state=available';
-    echo '<button onclick=request()>Request Goober</button>';
+    echo '<button class="full" onclick=request()>Request Goober</button>';
   } else if ($state == 'reserved') { 
     $filter = "car=$car";
     echo '<button onclick=cancel()>Cancel</button>';
@@ -74,6 +81,8 @@ $titleMap = [
     $filter = "car=$car";
   } 
 ?>
+</div>
+</div>
   </body>
   <script src="map.js"></script>
   <script src="socket.io.js"></script>
@@ -151,4 +160,6 @@ window.onload = function(){
   </script>
 </html>
 
-<? var_dump([$car, $state]);exit;?>
+<!--<? 
+echo session_id();
+var_dump([$car, $state]);exit;?>-->

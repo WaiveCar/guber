@@ -14,6 +14,7 @@ button {
   font-weight: 800;
   border: 4px;
   border-radius: 4vh;
+  wackground: #ff4d7d;
   text-transform: uppercase;
 }
 button.white { 
@@ -72,6 +73,7 @@ textarea {
   width: 100%;
 }
 #header {
+  height: 10vh;
   text-align: center;
   background: #514aff;
   padding-bottom: 10vh;
@@ -120,6 +122,10 @@ iframe {
 }
 #bottom {
   position: absolute;
+  background: white;
+  height: 12vh;
+  border-radius: 4vh 4vh 0 0;
+  box-shadow: 0 0 6px 1px rgba(0,0,0,0.2);
   bottom: 0;
   width: 100%;
   left: 0;
@@ -141,11 +147,14 @@ iframe {
 #wait-pitch h2 small { font-weight: 700;font-size: 1rem;margin-top:1rem;display:block;text-transform: uppercase }
 #wait-pitch h4 { font-weight: 500 }
 
-.wait, .create, .dashboard {
-  display: none;
-}
 
-.mode-create .create { display: block; }
+.mode-find .find { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2vh;
+  height: 100%;
+}
 .mode-wait .wait { display: block; }
 .mode-dashboard .dashboard { display: block; }
 #go-again {
@@ -167,12 +176,12 @@ iframe {
   margin: 0 1vh;
   height: 45vh; 
 }
-.mode-create #white-box-parent { display: none }
-.mode-create #header { padding-bottom: 1vh }
+.mode-find #white-box-parent { display: none }
+.mode-find #header { padding-bottom: 1vh }
 
-.mode-create #map { 
+.mode-find #map { 
   border-radius: 4vh 4vh 0 0;
-height: 51vh; }
+height: 78vh; }
 .mode-wait #map { display: none }
 
 @media all and (orientation:landscape) {
