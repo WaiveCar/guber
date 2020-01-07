@@ -93,8 +93,9 @@ var
   _carMap = {},
   _blueDot = false,
   _socket = false,
-  filter = "<?= $filter ?>", car=<? if($car) { echo $car; } else { echo 'false'; } ?>;
-//function toMap(what) {
+  _me = {id:"<?=session_id(); ?>"},
+  filter = "<?= $filter ?>", 
+  _car = <? if($car) { echo $car; } else { echo 'false'; } ?>;
 
 function getLocations() {
   fetch('api/screens?' + filter)
@@ -108,6 +109,8 @@ function getLocations() {
 
 function updateLocation(pos) {
   var crd = pos.coords;
+  _me.lat = crd.latitude;
+  _me.lng = crd.longitude;
   if(!_blueDot) {
     let loc = [crd.longitude, crd.latitude];
     _blueDot = _map.addOne(['Location', loc]);
@@ -121,14 +124,17 @@ function locationError(what) {
   console.log(what);
 }
 
+function mekv() {
+  return "&lat=" + _me.lat + "&lng=" + _me.lng;
+}
+
 function api(what) {
-  return fetch('http://waivescreen.com/api/' + what + '?id=' + car)
+  return fetch('http://waivescreen.com/api/' + what + '?id=' + _car + mekv())
     .then(response => response.json())
 }
 
 function request() {
-  if(!car) { car = 107;} 
-  return fetch('proxy.php?action=request&id=' + car)
+  return fetch('proxy.php?action=request&id=' + _car + mekv())
     .then(response => response.json())
 }
 
@@ -157,7 +163,6 @@ function addCar(data) {
 }
 function moveCar(data) {
   if(_carMap[data.id]) {
-    //console.log("move>>", _carMap[data.car].index);
     _map.move(_carMap[data.id].index, data.lat, data.lng);
   } 
 }
@@ -181,32 +186,24 @@ window.onload = function(){
     }
   });
 
-  var sincity = [-115.1542192, 36.1316824];
-
   self._map = map({
     select: true,
-    center: sincity,
     zoom: 14
   });
 
   getLocations();
+
   navigator.geolocation.watchPosition(
-    updateLocation, locationError, 
-    {
+    updateLocation, locationError, {
       enableHighAccuracy: true,
       timeout: 5000,
       maximumAge: 0
     });
 
   _map.on('select', function(a) { 
-    console.log(a.target.getFeatures().item(0).getId());
-    self.a = a;
-    console.log(a) 
+    _car = a.target.getFeatures().item(0).getId();
   })
 }
   </script>
 </html>
 
-<!--<? 
-echo session_id();
-exit;?>-->

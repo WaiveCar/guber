@@ -10,6 +10,7 @@ if(isset($_GET['id'])) {
     return in_array($row['id'], $gooberable);
   });
 }
+function getGoober() {
 ?>
 <!DOCTYPE html>
 <html>
