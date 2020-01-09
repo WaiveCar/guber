@@ -15,34 +15,36 @@ video {
  </div>
 </body>
 <script>
-var hidden, visibilityChange, state = 'yes';
-if (typeof document.hidden !== "undefined") {
-  hidden = "hidden";
-  visibilityChange = "visibilitychange";
-} else if (typeof document.msHidden !== "undefined") {
-  hidden = "msHidden";
-  visibilityChange = "msvisibilitychange";
-} else if (typeof document.webkitHidden !== "undefined") {
-  hidden = "webkitHidden";
-  visibilityChange = "webkitvisibilitychange";
-}
-
-function handleVisibilityChange() {
-  if (document[hidden]) {
-    state = 'no';
-  } else {
-    state = 'yes';
+if(document.location.hash !== '#monitor') {
+  var hidden, visibilityChange, state = 'yes';
+  if (typeof document.hidden !== "undefined") {
+    hidden = "hidden";
+    visibilityChange = "visibilitychange";
+  } else if (typeof document.msHidden !== "undefined") {
+    hidden = "msHidden";
+    visibilityChange = "msvisibilitychange";
+  } else if (typeof document.webkitHidden !== "undefined") {
+    hidden = "webkitHidden";
+    visibilityChange = "webkitvisibilitychange";
   }
-  ping();
+
+  function handleVisibilityChange() {
+    if (document[hidden]) {
+      state = 'no';
+    } else {
+      state = 'yes';
+    }
+    ping();
+  }
+
+  function ping() {
+    fetch('api/video?state=' + state);
+  }
+
+  // this is a heartbeat ... if we haven't heard back in about 10 seconds we sleep regardless.
+  setInterval(ping, 1000);
+
+  document.addEventListener(visibilityChange, handleVisibilityChange, false);
 }
-
-function ping() {
-  fetch('api/video?state=' + state);
-}
-
-// this is a heartbeat ... if we haven't heard back in about 10 seconds we sleep regardless.
-setInterval(ping, 1000);
-
-document.addEventListener(visibilityChange, handleVisibilityChange, false);
 </script>
 
