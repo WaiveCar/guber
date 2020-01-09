@@ -14,3 +14,35 @@ video {
  <video muted data-dashjs-player autoplay src="https://d3f95ionl4l2q1.cloudfront.net/out/v1/cf6ca999cc394cc7851ebdb899406e72/index.mpd" nocontrols></video>
  </div>
 </body>
+<script>
+var hidden, visibilityChange, state = 'show';
+if (typeof document.hidden !== "undefined") {
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
+
+function handleVisibilityChange() {
+  if (document[hidden]) {
+    state = 'hide';
+  } else {
+    state = 'show';
+  }
+  ping();
+}
+
+function ping() {
+  fetch('api/video?state=' + state);
+}
+
+// this is a heartbeat ... if we haven't heard back in about 10 seconds we sleep regardless.
+setInterval(ping, 1000);
+
+document.addEventListener(visibilityChange, handleVisibilityChange, false);
+</script>
+
