@@ -11,7 +11,7 @@ video {
 </style>
 <body>
  <div>
- <video muted data-dashjs-player autoplay src="https://d3f95ionl4l2q1.cloudfront.net/out/v1/cf6ca999cc394cc7851ebdb899406e72/index.mpd" nocontrols></video>
+<video muted data-dashjs-player autoplay src="https://d3f95ionl4l2q1.cloudfront.net/out/v1/cf6ca999cc394cc7851ebdb899406e72/index.mpd" nocontrols></video>
  </div>
 </body>
 <script>
@@ -41,8 +41,7 @@ if(document.location.hash !== '#monitor') {
     fetch('api/video?state=' + state);
   }
 
-  // this is a heartbeat ... if we haven't heard back in about 10 seconds we sleep regardless.
-  setInterval(ping, 1000);
+  setInterval(ping, 6000);
 
   document.addEventListener(visibilityChange, handleVisibilityChange, false);
 }
