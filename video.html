@@ -15,7 +15,8 @@ video {
  </div>
 </body>
 <script>
-if(document.location.hash !== '#monitor') {
+if(document.location.hash === '#booth') {
+  console.log("live");
   var hidden, visibilityChange, state = 'yes';
   if (typeof document.hidden !== "undefined") {
     hidden = "hidden";
@@ -44,6 +45,8 @@ if(document.location.hash !== '#monitor') {
   setInterval(ping, 6000);
 
   document.addEventListener(visibilityChange, handleVisibilityChange, false);
+} else {
+  console.log("monitor");
 }
 </script>
 
