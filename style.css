@@ -1,12 +1,15 @@
 * { font-family: 'Roboto', sans-serif; }
 a, :visited { color: #fff; }
 body { 
-  background: #514aff;
+  background: #fff;
   color: #fff;
   height: 100%;
   margin: 0;
 }
 
+h2 {
+  color: #514aff;
+}
 button { 
   padding: 1.75vh 7vh;
   color: #fff;
@@ -14,25 +17,37 @@ button {
   font-weight: 800;
   border: 4px;
   border-radius: 4vh;
-  wackground: #ff4d7d;
+  background: #ff4d7d;
   text-transform: uppercase;
 }
-button.white { 
+button.muted { 
+  border: 2px solid #918a91;
   background: #fff;
+  padding: 1.75vh 2vh;
+  color: #918a91;
+}
+button.white { 
+  border: 2px solid #514aff;
+  background: #fff;
+  padding: 1.75vh 2vh;
   color: #514aff;
 }
+button.small { 
+  padding: 1.75vh 2vh;
+  background: #514aff;
+}
 button.primary { 
-  background: #ff4d7d;
+  background: #514aff;
   font-size: 1.05rem;
 }
-input[type="text"],textarea {
+input[type="text"],input[type="password"],textarea {
   padding: .5rem;
   border-radius: 2.5vh;
   background: #edecff;
   border: 0;
   font-size: 1.2rem;
   color: #514aff;
-  width: 100%;
+  width: 80%;
 }
 input[type="text"]::placeholder,textarea::placeholder{
   color: #514aff;
@@ -125,6 +140,7 @@ iframe {
   background: white;
   height: 12vh;
   border-radius: 4vh 4vh 0 0;
+   transition: all 0.5s ease;
   box-shadow: 0 0 6px 1px rgba(0,0,0,0.2);
   bottom: 0;
   width: 100%;
@@ -179,11 +195,12 @@ iframe {
 .mode-find #white-box-parent { display: none }
 .mode-find #header { padding-bottom: 1vh }
 
-.mode-find #map { 
-  border-radius: 4vh 4vh 0 0;
-height: 78vh; }
 .mode-wait #map { display: none }
 
+#bottom.start { height: 15vh}
+#bottom.reserved { height: 25vh}
+#bottom.available { height: 25vh}
+#bottom.confirmed { height: 30vh}
 @media all and (orientation:landscape) {
   #header { 
     display: none 
